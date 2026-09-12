@@ -102,6 +102,8 @@
   .progress h2,.progress .lead{color:var(--cream)}
   .progress .lead{color:rgba(244,239,231,.8)}
   .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1px;background:var(--ink-line);border:1px solid var(--ink-line);margin-top:3rem}
+  .card.wide{grid-column:span 2}
+  @media (max-width:640px){.card.wide{grid-column:span 1}}
   .card{background:var(--ink);padding:2rem 1.7rem 2.2rem}
   .card h3{font-size:var(--text-lg);font-family:var(--font-body);font-weight:700;letter-spacing:0;margin-bottom:.6rem;color:#fff}
   .card p{color:rgba(244,239,231,.72);font-size:var(--text-sm);margin:0}
@@ -255,7 +257,7 @@
         <h3>Local and national press</h3>
         <p>We are reaching out to journalists and local media to highlight the impact the closure is having on Battersea and Chelsea.</p>
       </article>
-      <article class="card">
+      <article class="card wide">
         <span class="tag">Air quality</span>
         <h3>Why motorists matter</h3>
         <p>Traffic is now gridlocked on both sides of the river, pushing up air pollution in residential streets on both banks. The bridge needs to reopen to motorists &mdash; for our health, not just our journey times.</p>
