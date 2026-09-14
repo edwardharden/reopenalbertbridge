@@ -137,6 +137,21 @@
   .form-status{grid-column:1/-1;font-size:var(--text-sm);font-weight:500;color:var(--rose);min-height:1.3rem}
   @media(max-width:640px){.form{grid-template-columns:1fr}}
 
+  /* subscribe */
+  .subscribe{background:var(--ink);color:var(--cream)}
+  .subscribe h2{color:#fff}
+  .subscribe .lead{color:rgba(244,239,231,.8)}
+  .sub-form{display:grid;grid-template-columns:.85fr 1.15fr auto;gap:.9rem;align-items:end;margin-top:2.4rem}
+  .sub-form label{color:rgba(244,239,231,.62)}
+  .sub-form input{background:rgba(244,239,231,.07);border-color:rgba(244,239,231,.26);color:var(--cream)}
+  .sub-form input::placeholder{color:rgba(244,239,231,.42)}
+  .sub-form input:focus{background:rgba(244,239,231,.12);border-color:var(--rose-light);outline-color:var(--rose-light)}
+  .sub-form .btn{white-space:nowrap;padding-block:.82rem}
+  .sub-foot{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;align-items:baseline;margin-top:.4rem}
+  .sub-note{font-size:var(--text-xs);color:rgba(244,239,231,.55);max-width:62ch;margin:0}
+  .sub-status{grid-column:1/-1;font-size:var(--text-sm);font-weight:500;color:var(--rose-light);min-height:1.3rem;margin:0}
+  @media(max-width:760px){.sub-form{grid-template-columns:1fr}.sub-form .btn{width:100%}}
+
   /* final cta */
   .final{background:var(--ink);color:var(--cream);text-align:center}
   .final h2{color:#fff;margin-inline:auto;max-width:26ch}
@@ -322,6 +337,31 @@
   </div>
 </section>
 
+<section class="subscribe" id="updates">
+  <div class="narrow">
+    <div class="section-head reveal">
+      <p class="kicker">Campaign updates</p>
+      <h2>Get the updates by email</h2>
+      <p class="lead" style="margin-top:1.2rem">We will email you when there is something worth knowing — responses from RBKC, TfL and our elected representatives, repair milestones, meeting dates and reopening news. No more than that.</p>
+    </div>
+    <form class="sub-form reveal" id="subscribe-form" method="post" target="_blank" novalidate>
+      <div class="field">
+        <label for="sub-name">First name <span style="text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input id="sub-name" name="fields[first_name]" type="text" autocomplete="given-name" placeholder="Jane" />
+      </div>
+      <div class="field">
+        <label for="sub-email">Email address</label>
+        <input id="sub-email" name="email_address" type="email" autocomplete="email" placeholder="you@example.com" required />
+      </div>
+      <button class="btn btn-primary" type="submit">Send me updates</button>
+      <div class="sub-foot">
+        <p class="sub-note">By subscribing you agree to receive campaign updates by email. We will never sell or share your address, and every email has a one-click unsubscribe link.</p>
+      </div>
+      <p class="sub-status" id="sub-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
 <section class="contact" id="contact">
   <div class="narrow">
     <div class="section-head reveal">
@@ -368,18 +408,23 @@
 <footer>
   <div class="wrap">
     <span>Albert Bridge campaign — residents and businesses of Battersea &amp; Chelsea.</span>
-    <span><a href="#contact">Get in touch</a> · <a href="https://docs.google.com/forms/d/e/1FAIpQLSewm5Pop-TwTgGopKRaLoh81UIXMt12kM1Gs2f_Tk4ZrYmG9A/viewform" target="_blank" rel="noopener">Sign the open letter</a></span>
+    <span><a href="#updates">Email updates</a> · <a href="#contact">Get in touch</a> · <a href="https://docs.google.com/forms/d/e/1FAIpQLSewm5Pop-TwTgGopKRaLoh81UIXMt12kM1Gs2f_Tk4ZrYmG9A/viewform" target="_blank" rel="noopener">Sign the open letter</a></span>
   </div>
 </footer>
 
 <script>
   /* ---------------------------------------------------------------
-     CAMPAIGN CONFIG — change these two values and nothing else.
-     CAMPAIGN_EMAIL: where the contact form sends messages.
-     PETITION_URL:   the open letter link (also used by the share buttons).
+     CAMPAIGN CONFIG — change these values and nothing else.
+     CAMPAIGN_EMAIL:  where the contact form sends messages.
+     PETITION_URL:    the open letter link (also used by the share buttons).
+     KIT_FORM_ACTION: the Kit (ConvertKit) form endpoint for email updates,
+                      e.g. "https://app.kit.com/forms/1234567/subscriptions".
+                      Leave empty and the signup falls back to opening an
+                      email to CAMPAIGN_EMAIL instead.
   --------------------------------------------------------------- */
   var CAMPAIGN_EMAIL = "melisongun@gmail.com";
   var PETITION_URL = "https://docs.google.com/forms/d/e/1FAIpQLSewm5Pop-TwTgGopKRaLoh81UIXMt12kM1Gs2f_Tk4ZrYmG9A/viewform";
+  var KIT_FORM_ACTION = "";
 
   var shareText = "Albert Bridge has been closed since February 2026. Residents and businesses in Battersea and Chelsea are calling for urgent coordinated action — please sign the open letter:";
   document.getElementById('share-wa').href = 'https://wa.me/?text=' + encodeURIComponent(shareText + ' ' + PETITION_URL);
@@ -418,6 +463,39 @@
       + '?subject=' + encodeURIComponent('Albert Bridge closure — my experience')
       + '&body=' + encodeURIComponent(body);
     setTimeout(function(){ status.textContent = 'If nothing opened, email us directly at ' + CAMPAIGN_EMAIL + '.'; }, 2500);
+  });
+
+  var subForm = document.getElementById('subscribe-form'), subStatus = document.getElementById('sub-status');
+  if (KIT_FORM_ACTION) { subForm.setAttribute('action', KIT_FORM_ACTION); }
+  subForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = subForm['sub-email'].value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      subStatus.textContent = 'Please enter a valid email address.';
+      subForm['sub-email'].focus();
+      return;
+    }
+    if (!KIT_FORM_ACTION) {
+      subStatus.textContent = 'Opening your email app…';
+      window.location.href = 'mailto:' + CAMPAIGN_EMAIL
+        + '?subject=' + encodeURIComponent('Please add me to the Albert Bridge campaign updates')
+        + '&body=' + encodeURIComponent('Please add ' + email + ' to the campaign update list.\n\nName: ' + (subForm['sub-name'].value.trim() || '—'));
+      setTimeout(function(){ subStatus.textContent = 'If nothing opened, email us at ' + CAMPAIGN_EMAIL + ' and we will add you.'; }, 2500);
+      return;
+    }
+    subStatus.textContent = 'Adding you to the list…';
+    fetch(KIT_FORM_ACTION, {
+      method: 'POST',
+      body: new FormData(subForm),
+      headers: { 'Accept': 'application/json' }
+    }).then(function (res) {
+      if (!res.ok) { throw new Error('bad status'); }
+      subForm.reset();
+      subStatus.textContent = 'Thank you — please check your inbox and confirm your email address.';
+    }).catch(function () {
+      subStatus.textContent = 'Finishing your signup in a new tab…';
+      subForm.submit();
+    });
   });
 
   var io = new IntersectionObserver(function (entries) {
